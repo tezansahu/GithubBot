@@ -9,7 +9,10 @@ class GithubBot:
         # dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
         dotenv_path = './.env'
         load_dotenv(dotenv_path)
-        self.driver = webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+
+        self.driver = webdriver.Chrome(chrome_options=options)
 
         self.login()
 
@@ -103,4 +106,7 @@ class GithubBot:
 
         print("Repository deleted successfully!")
 
+    def addLicense()
 
+    def __del__(self):
+        self.driver.close()
