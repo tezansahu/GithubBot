@@ -86,12 +86,12 @@ class GithubBot:
     def deleteRepo(self, repo_name):
         print("Deleting repository...", end="\r", flush=True)
 
-        self.driver.get("https://github.com/" + os.environ["GITHUB_USERNAME"] + "/" + repo_name)
+        self.driver.get("https://github.com/" + os.environ["GITHUB_USERNAME"] + "/" + repo_name + "/settings")
         time.sleep(2)
 
-        setting_btn = self.driver.find_element_by_xpath('//*[@id="js-repo-pjax-container"]/div[1]/nav/a[5]')
-        setting_btn.click()
-        time.sleep(2)
+        # setting_btn = self.driver.find_element_by_xpath('//*[@id="js-repo-pjax-container"]/div[1]/nav/a[5]')
+        # setting_btn.click()
+        # time.sleep(2)
 
         delete_repo_btn = self.driver.find_element_by_xpath('//*[@id="options_bucket"]/div[8]/ul/li[4]/details/summary')
         delete_repo_btn.click()
@@ -151,6 +151,36 @@ class GithubBot:
         
         finally:
             print("License added successfully", flush=True)
+
+    def addCollaborator(self, repo_name, collaborator):
+        self.driver.get("https://github.com/" + os.environ["GITHUB_USERNAME"] + "/" + repo_name + "/settings")
+        time.sleep(2)
+
+        manage_access_btn = self.driver.find_element_by_xpath('//*[@id="js-repo-pjax-container"]/div[2]/div/div/div[1]/div/nav[1]/a[2]')
+        manage_access_btn.click()
+        time.sleep(2)
+
+        try:
+            invite_collab_btn = self.driver.find_element_by_xpath('//*[@id="js-repo-pjax-container"]/div[2]/div/div/div[2]/div[4]/div/details/summary')
+        except Exception as e:
+            if "no such element" in e.msg:
+                invite_collab_btn = self.driver.find_element_by_xpath('//*[@id="add-access-dialog"]/summary')
+            else:
+                return "Internal Error"
+        
+        invite_collab_btn.click()
+
+        collab_input = self.driver.find_element_by_xpath('//*[@id="repo-add-access-search-member"]')
+        collab_input.send_keys(collaborator)
+        time.sleep(1)
+
+        auto_complete = self.driver.find_element_by_xpath('//*[@id="repo-add-access-search-results-option-0"]/div[1]')
+        auto_complete.click()
+
+        add_collab_btn = self.driver.find_element_by_xpath('//*[@id="repo-add-access-selector"]/div[2]/div[2]/button')
+        add_collab_btn.click()
+
+
 
 
     def __del__(self):
