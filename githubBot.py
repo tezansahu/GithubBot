@@ -106,7 +106,52 @@ class GithubBot:
 
         print("Repository deleted successfully!")
 
-    def addLicense()
+    def addLicense(self, repo_name):
+        print("Creating License file...", end="\r", flush=True)
+        
+        self.driver.get("https://github.com/" + os.environ["GITHUB_USERNAME"] + "/" + repo_name + "/new/master?filename=LICENSE.md")
+        time.sleep(2)
+
+        choose_license_btn = self.driver.find_element_by_xpath('//*[@id="js-repo-pjax-container"]/div[2]/div/div/form[2]/div[1]/div[2]/a')
+        choose_license_btn.click()
+        time.sleep(2)
+
+        mit_license_btn = self.driver.find_element_by_xpath('/html/body/div[4]/div/main/div[2]/div/div[2]/div[1]/a[3]')
+        mit_license_btn.click()
+        time.sleep(2)
+
+        review_btn = self.driver.find_element_by_xpath('//*[@id="license-add"]')
+        review_btn.click()
+        time.sleep(2)
+
+        print("Committing License file...", end="\r", flush=True)
+        commit_btn = self.driver.find_element_by_xpath('//*[@id="submit-file"]')
+        commit_btn.click()
+
+        time.sleep(4)
+
+        # This block is to check only if a PR for License Creation needs to be merged
+        try:
+            print("Creating & Merging Pull Request...", end="\r", flush=True)
+            create_pr_btn = self.driver.find_element_by_xpath('//*[@id="new_pull_request"]/div/div[1]/div/div[1]/div[2]/div/button')
+            create_pr_btn.click()
+            time.sleep(4)
+
+            merge_pr_btn = self.driver.find_element_by_xpath('//*[@id="partial-pull-merging"]/div[1]/div/div/div/div[3]/div/div/button[1]')
+            merge_pr_btn.click()
+
+            confirm_merge_btn = self.driver.find_element_by_xpath('//*[@id="partial-pull-merging"]/div[1]/form/div/div[2]/div/div[1]/button')
+            confirm_merge_btn.click()
+
+            time.sleep(2)
+        
+        except Exception as e:
+            # The exception will be raised here if LICENSE.md is added to an empty repository, without need for PR
+            pass
+        
+        finally:
+            print("License added successfully", flush=True)
+
 
     def __del__(self):
         self.driver.close()
